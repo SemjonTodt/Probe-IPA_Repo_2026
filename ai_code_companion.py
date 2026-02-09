@@ -1,7 +1,15 @@
 import argparse
 import sys
 import os
+from dotenv import load_dotenv
+from openai import OpenAI
 
+load_dotenv()
+
+client = OpenAI(
+    api_key=os.getenv("DEEPSEEK_API_KEY"),
+    base_url="https://api.deepseek.com"
+)
 
 def handle_exceptions(message):
     """
@@ -49,17 +57,44 @@ def read_file(path):
 
 def get_ai_response(code):
     """
-    Sends code to the DeepSeek API.
-    Placeholder – will be implemented later.
+    Sends code to the DeepSeek API and returns the generated documentation.
     """
-    pass
+    try:
+        response = client.chat.completions.create(
+            model="deepseek-chat",
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You are an AI that analyzes Python code and creates short English "
+                        "documentation describing each function, including purpose, parameters "
+                        "and return values."
+                    )
+                },
+                {
+                    "role": "user",
+                    "content": code
+                }
+            ]
+        )
+
+        print("API response received.")
+        print(response.choices[0].message.content.strip())
+        return response.choices[0].message.content.strip()
+
+    except Exception as e:
+        handle_exceptions(f"API error: {str(e)}")
 
 
 def save_result(text):
     """
     Saves the AI response to a text file.
     """
-    pass
+    try:
+        with open("dokumentation.txt", "w", encoding="utf-8") as file:
+            file.write(text)
+    except Exception as e:
+        handle_exceptions(f"Could not save documentation: {str(e)}")
 
 
 def main():
@@ -70,7 +105,12 @@ def main():
     code = read_file(args.filepath)
 
     print("File successfully read.")
-    print("Ready for API processing...")
+
+    documentation = get_ai_response(code)
+    print("AI response received successfully.")
+
+    save_result(documentation)
+    print("Documentation saved to dokumentation.txt")
 
 
 if __name__ == "__main__":
