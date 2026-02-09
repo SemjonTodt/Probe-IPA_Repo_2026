@@ -83,7 +83,14 @@ def get_ai_response(code):
         return response.choices[0].message.content.strip()
 
     except Exception as e:
-        handle_exceptions(f"API error: {str(e)}")
+        error_message = str(e)
+
+        if "401" in error_message or "authentication" in error_message.lower():
+            handle_exceptions(
+                "Authentication failed. The API key is missing, invalid or expired."
+            )
+
+        handle_exceptions(f"API error: {error_message}")
 
 
 def save_result(text):
