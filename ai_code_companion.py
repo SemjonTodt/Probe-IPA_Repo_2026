@@ -66,9 +66,14 @@ def get_ai_response(code):
                 {
                     "role": "system",
                     "content": (
-                        "You are an AI that analyzes Python code and creates short English "
-                        "documentation describing each function, including purpose, parameters "
-                        "and return values."
+                        "Analyze the following Python code.\n\n"
+                        "For each function, generate a short English documentation containing only:\n"
+                        "- Function name\n"
+                        "- Purpose\n"
+                        "- Parameters (name and description)\n"
+                        "- Return value\n\n"
+                        "Do NOT include examples, code blocks, markdown formatting or additional explanations.\n"
+                        "Use plain text only."
                     )
                 },
                 {
